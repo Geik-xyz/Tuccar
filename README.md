@@ -2,6 +2,9 @@
 
 > `1.13 ve üzeri bir sürümde kullanıyorsanız .jar dosyasını winrar ile açıp 1.16 config dosyasını mevcut config dosyasıyla değiştirin!`
 
+![Usage](img/usage.png)
+### [Click for live usage](https://bstats.org/plugin/bukkit/Tuccar/10085)
+
 # Tuccar
 
 Tüccar bir oyun içi oyuncu marketi eklentisidir. 
