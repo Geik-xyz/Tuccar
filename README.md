@@ -1,6 +1,6 @@
-> `Eklentinin artık geliştirilmemektedir.`
+> Eklentinin artık geliştirilmemektedir.
 
-> `1.13 ve üzeri bir sürümde kullanıyorsanız .jar dosyasını winrar ile açıp 1.16 config dosyasını mevcut config dosyasıyla değiştirin!`
+> 1.13 ve üzeri bir sürümde kullanıyorsanız .jar dosyasını winrar ile açıp 1.16 config dosyasını mevcut config dosyasıyla değiştirin!
 
 # Tuccar
 
