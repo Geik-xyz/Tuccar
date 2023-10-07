@@ -13,6 +13,7 @@ Görevli bir NPC ile çalışan bu eklenti oyuncuların kendi eşyalarını diğ
 ## Config ve Dil dosyası
 <details>
   <summary>config.yml</summary>
+
     Settings:
     # SHIFT + SOL tık ile alınacak adet sayısıdır.
     customBuyAmount: 32
@@ -1824,6 +1825,7 @@ Görevli bir NPC ile çalışan bu eklenti oyuncuların kendi eşyalarını diğ
 
 <details>
     <summary>lang.yml</summary>
+    
         TuccarGui: '&8Tüccar'
         CategoryGui: '&8Tüccar &0/'
         itemGui: '&8Ürünler &0/'
