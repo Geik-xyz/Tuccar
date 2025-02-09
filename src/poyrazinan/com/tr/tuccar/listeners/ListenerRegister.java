@@ -12,10 +12,7 @@ import poyrazinan.com.tr.tuccar.listeners.Guis.PlayerProductsListener;
 public class ListenerRegister {
 	
 	public Tuccar plugin;
-	public ListenerRegister(Tuccar plugin) {
-		this.plugin = plugin;
-	}
-	
+
 	private Listeners listeners;
 	private CategorySelectionListener categorySelectionListener;
 	private ItemSelectionListener itemSelectionListener;

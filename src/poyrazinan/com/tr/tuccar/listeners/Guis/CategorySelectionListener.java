@@ -42,7 +42,7 @@ public class CategorySelectionListener implements Listener {
 				 List<CategoryStorage> storage = Tuccar.categoryStore;
 				 CategoryStorage categoryItem = null;
 				 
-				 if (Tuccar.customItems.keySet().contains(e.getSlot()))
+				 if (Tuccar.customItems.containsKey(e.getSlot()))
 				 {
 					 
 					 player.closeInventory();
@@ -61,12 +61,12 @@ public class CategorySelectionListener implements Listener {
 				 }
 				 
 				 
-				 if (e.getSlot() == Integer.valueOf(getLang.getText("Gui.help.slot"))) {
+				 if (e.getSlot() == Integer.parseInt(getLang.getText("Gui.help.slot"))) {
 					 player.closeInventory();
 					 MainCommands.help(player);
 				 } 
 				 if (getLang.isSet("Gui.myProducts")) {
-					 if (e.getSlot() == Integer.valueOf(getLang.getText("Gui.myProducts.slot"))) {
+					 if (e.getSlot() == Integer.parseInt(getLang.getText("Gui.myProducts.slot"))) {
 						 player.closeInventory();
 						 PlayerProducts.createGui(player, 1);}
 				 }
@@ -74,7 +74,8 @@ public class CategorySelectionListener implements Listener {
 					 if (x.getSlot() == e.getSlot()) {
 						 categoryItem = x;
 						 break;
-					 } else continue;}
+					 }
+                 }
 				 if (categoryItem != null) {
 					 player.closeInventory();
 					 ItemSelectionGui.createGui(player, categoryItem.getCategoryDataName(), 1);

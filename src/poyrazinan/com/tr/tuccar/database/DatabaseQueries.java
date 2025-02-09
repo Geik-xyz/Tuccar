@@ -22,25 +22,29 @@ import poyrazinan.com.tr.tuccar.api.events.ProductRemoveEvent;
 import poyrazinan.com.tr.tuccar.commands.AddProduct.RegisterManager;
 
 public class DatabaseQueries {
-	
+
 	public static void createTable() {
-	    try (Connection connection = ConnectionPool.getConnection();
-	         Statement statement = connection.createStatement()) {
-	        statement.addBatch("CREATE TABLE IF NOT EXISTS `Tablo`\n" +
-	                "(\n" +
-	                " `id`         INTEGER PRIMARY KEY AUTOINCREMENT,\n" +
-	                " `username`         varchar(20) NOT NULL,\n" +
-	                " `category`          text NOT NULL,\n" +
-	                " `product`          text NOT NULL,\n" +
-	                " `stock`          int DEFAULT 0,\n" +
-	                " `price`          double DEFAULT 0\n" +
-	                ");");
-	        statement.executeBatch();
-	    } catch (SQLException | ClassNotFoundException e) {
-	        e.printStackTrace();
-	    }
+		String createTableSQL = "CREATE TABLE IF NOT EXISTS `Tablo` (" +
+				"`id` INTEGER PRIMARY KEY AUTO_INCREMENT," +
+				"`username` varchar(20) NOT NULL," +
+				"`category` text NOT NULL," +
+				"`product` text NOT NULL," +
+				"`stock` int DEFAULT 0," +
+				"`price` double DEFAULT 0" +
+				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
+
+		try (Connection connection = ConnectionPool.getConnection();
+			 Statement statement = connection.createStatement()) {
+			statement.execute(createTableSQL);
+			Bukkit.getLogger().info("[Tuccar] Veritabanı tablosu başarıyla kontrol edildi/oluşturuldu.");
+
+		} catch (SQLException e) {
+			Bukkit.getLogger().severe("[Tuccar] Tablo oluşturulurken hata: " + e.getMessage());
+			e.printStackTrace();
+		}
 	}
-	
+
+
 	public static boolean registerProductToTable(String playerName, String category, String product, int stock, double price)
 	{
 		String SQL_QUERY = "INSERT INTO Tablo (username, category, product, stock, price) VALUES (?, ?, ?, ?, ?)";
@@ -59,7 +63,7 @@ public class DatabaseQueries {
             return true;
         } 
         
-        catch (ClassNotFoundException | SQLException e) {return false;}
+        catch (SQLException e) {return false;}
         
 	}
 	
@@ -94,7 +98,7 @@ public class DatabaseQueries {
             pst2.close();
             
             
-        } catch (ClassNotFoundException | SQLException e1) { e1.printStackTrace(); }
+        } catch (SQLException e1) { e1.printStackTrace(); }
         
 		return new ProductCounts(minPrice, seller);
 	}
@@ -113,7 +117,7 @@ public class DatabaseQueries {
             	break;}
             resultSet.close();
             pst.close();
-        } catch (ClassNotFoundException | SQLException e1) {}
+        } catch (SQLException e1) {}
 		return minPrice;
 	}
 	
@@ -145,7 +149,7 @@ public class DatabaseQueries {
             }
             resultSet.close();
             pst.close();
-        } catch (ClassNotFoundException | SQLException e1) {}
+        } catch (SQLException e1) {}
 		return storage;
 	}
 	
@@ -177,7 +181,7 @@ public class DatabaseQueries {
             }
             resultSet.close();
             pst.close();
-        } catch (ClassNotFoundException | SQLException e1) {}
+        } catch (SQLException e1) {}
 		return storage;
 	}
 	
@@ -195,7 +199,7 @@ public class DatabaseQueries {
             }
             resultSet.close();
             pst.close();
-        } catch (ClassNotFoundException | SQLException e1) {}
+        } catch (SQLException e1) {}
 		return status;
 	}
 	
@@ -245,7 +249,7 @@ public class DatabaseQueries {
             }
             resultSet.close();
             pst.close();
-        } catch (ClassNotFoundException | SQLException e1) {}
+        } catch (SQLException e1) {}
 		return storage;
 	}
 	
@@ -261,7 +265,7 @@ public class DatabaseQueries {
             else check = false;
             resultSet.close();
             pst.close();
-        } catch (ClassNotFoundException | SQLException e1) {}
+        } catch (SQLException e1) {}
 		return check;
 	}
 	
@@ -282,7 +286,7 @@ public class DatabaseQueries {
             pst.close();
         }
         
-        catch (ClassNotFoundException | SQLException e) { return 0; }
+        catch (SQLException e) { return 0; }
         
         return count;
 	}
@@ -313,7 +317,7 @@ public class DatabaseQueries {
                 
             }
         	
-        	catch (ClassNotFoundException | SQLException e) {}
+        	catch (SQLException e) {}
         	
         } else {
         	try (Connection con = ConnectionPool.getConnection()) {
@@ -326,7 +330,7 @@ public class DatabaseQueries {
                 pst.close();
             }
         	
-        	catch (ClassNotFoundException | SQLException e) {}
+        	catch (SQLException e) {}
         	
         }
 	}
@@ -343,7 +347,7 @@ public class DatabaseQueries {
             pst.close();
         }
     	
-    	catch (ClassNotFoundException | SQLException e) {}
+    	catch (SQLException e) {}
 	}
 	
 	public static void setProductPrice(int id, double price) {
@@ -358,7 +362,7 @@ public class DatabaseQueries {
             pst.close();
         }
     	
-    	catch (ClassNotFoundException | SQLException e) {}
+    	catch (SQLException e) {}
 	}
 	
 	public static ItemExistCheck getPlayerItem(String product, String category, String player) {
@@ -379,7 +383,7 @@ public class DatabaseQueries {
             }
             resultSet.close();
             pst.close();
-        } catch (ClassNotFoundException | SQLException e1) { return null; }
+        } catch (SQLException e1) { return null; }
 		return storage;
 	}
 
