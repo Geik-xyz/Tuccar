@@ -63,6 +63,10 @@ public class RedisManager {
     }
 
     public static void publishProductUpdate(ProductStorage product, String action) {
+        publishProductUpdate(product, action, null);
+    }
+
+    public static void publishProductUpdate(ProductStorage product, String action, String data) {
         if (!isRunning || pool == null || pool.isClosed()) {
             return;
         }
@@ -72,7 +76,7 @@ public class RedisManager {
                 CrossServerMessage message = new CrossServerMessage(
                         serverId,
                         action,
-                        product != null ? gson.toJson(product) : ""
+                        data != null ? data : (product != null ? gson.toJson(product) : "")
                 );
                 jedis.publish("tuccar_updates", gson.toJson(message));
             } catch (Exception e) {
@@ -131,16 +135,20 @@ public class RedisManager {
             this.data = data;
         }
 
-        public String getSourceServer() { return sourceServer; }
-        public String getAction() { return action; }
-        public String getData() { return data; }
+        public String getSourceServer() {
+            return sourceServer;
+        }
+
+        public String getAction() {
+            return action;
+        }
+
+        public String getData() {
+            return data;
+        }
     }
 
     private static void handleCrossServerMessage(CrossServerMessage message) {
-        if (message.getSourceServer().equals(serverId)) {
-            return;
-        }
-
         Bukkit.getScheduler().runTask(Tuccar.instance, () -> {
             try {
                 switch (message.getAction()) {
@@ -179,15 +187,13 @@ public class RedisManager {
                 ProductCounts counts = Tuccar.productInfo.get(product);
                 if (data.getNewPrice() < counts.getMinPrice()) {
                     counts.setMinPrice(data.getNewPrice());
-                else if (data.getOldPrice() == counts.getMinPrice()) {
+                } else if (data.getOldPrice() == counts.getMinPrice()) {
                     counts.setMinPrice(DatabaseQueries.getMinimumPrice(product, category));
                 }
-
                 Tuccar.productInfo.replace(product, counts);
             }
 
             Bukkit.getLogger().info("[Tuccar] Fiyat güncellendi - Ürün: " + product + ", Yeni Fiyat: " + data.getNewPrice());
-
         } catch (Exception e) {
             Bukkit.getLogger().warning("[Tuccar] Fiyat güncellenirken hata: " + e.getMessage());
         }
@@ -206,6 +212,7 @@ public class RedisManager {
             } else {
                 DatabaseQueries.addProductCount(data.getId(), data.getNewStock());
             }
+
             String product = data.getDataName();
             if (Tuccar.productInfo.containsKey(product)) {
                 ProductCounts counts = Tuccar.productInfo.get(product);
@@ -215,12 +222,10 @@ public class RedisManager {
                         counts.setMinPrice(DatabaseQueries.getMinimumPrice(product, data.getCategory()));
                     }
                 }
-
                 Tuccar.productInfo.replace(product, counts);
             }
 
             Bukkit.getLogger().info("[Tuccar] Stok güncellendi - Ürün: " + product + ", Yeni Stok: " + data.getNewStock());
-
         } catch (Exception e) {
             Bukkit.getLogger().warning("[Tuccar] Stok güncellenirken hata: " + e.getMessage());
         }
@@ -282,25 +287,4 @@ public class RedisManager {
         StockUpdateData updateData = new StockUpdateData(id, dataName, category, newStock, oldStock, price);
         publishProductUpdate(null, "STOCK_UPDATE", gson.toJson(updateData));
     }
-
-    public static void publishProductUpdate(ProductStorage product, String action, String data) {
-        if (!isRunning || pool == null || pool.isClosed()) {
-            return;
-        }
-
-        Bukkit.getScheduler().runTaskAsynchronously(Tuccar.instance, () -> {
-            try (Jedis jedis = pool.getResource()) {
-                CrossServerMessage message = new CrossServerMessage(
-                        serverId,
-                        action,
-                        data != null ? data : (product != null ? gson.toJson(product) : "")
-                );
-                jedis.publish("tuccar_updates", gson.toJson(message));
-            } catch (Exception e) {
-                Bukkit.getLogger().warning("[Tuccar] Redis mesajı gönderilemedi: " + e.getMessage());
-            }
-        });
-    }
-
-
 }

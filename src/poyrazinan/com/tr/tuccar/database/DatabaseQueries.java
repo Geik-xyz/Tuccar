@@ -24,26 +24,38 @@ import poyrazinan.com.tr.tuccar.commands.AddProduct.RegisterManager;
 public class DatabaseQueries {
 
 	public static void createTable() {
-		String createTableSQL = "CREATE TABLE IF NOT EXISTS `Tablo` (" +
-				"`id` INTEGER PRIMARY KEY AUTO_INCREMENT," +
-				"`username` varchar(20) NOT NULL," +
-				"`category` text NOT NULL," +
-				"`product` text NOT NULL," +
-				"`stock` int DEFAULT 0," +
-				"`price` double DEFAULT 0" +
-				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
+		String dbType = Tuccar.instance.getConfig().getString("Database.type", "SQLITE");
+		String createTableSQL;
+
+		if (dbType.equalsIgnoreCase("MYSQL")) {
+			createTableSQL = "CREATE TABLE IF NOT EXISTS `Tablo` (" +
+					"`id` INTEGER PRIMARY KEY AUTO_INCREMENT," +
+					"`username` varchar(20) NOT NULL," +
+					"`category` text NOT NULL," +
+					"`product` text NOT NULL," +
+					"`stock` int DEFAULT 0," +
+					"`price` double DEFAULT 0" +
+					") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
+		} else {
+			createTableSQL = "CREATE TABLE IF NOT EXISTS `Tablo` (" +
+					"`id` INTEGER PRIMARY KEY AUTOINCREMENT," +
+					"`username` TEXT NOT NULL," +
+					"`category` TEXT NOT NULL," +
+					"`product` TEXT NOT NULL," +
+					"`stock` INTEGER DEFAULT 0," +
+					"`price` REAL DEFAULT 0" +
+					");";
+		}
 
 		try (Connection connection = ConnectionPool.getConnection();
 			 Statement statement = connection.createStatement()) {
 			statement.execute(createTableSQL);
 			Bukkit.getLogger().info("[Tuccar] Veritabanı tablosu başarıyla kontrol edildi/oluşturuldu.");
-
 		} catch (SQLException e) {
 			Bukkit.getLogger().severe("[Tuccar] Tablo oluşturulurken hata: " + e.getMessage());
 			e.printStackTrace();
 		}
 	}
-
 
 	public static boolean registerProductToTable(String playerName, String category, String product, int stock, double price)
 	{
