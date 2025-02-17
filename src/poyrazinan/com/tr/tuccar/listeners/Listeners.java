@@ -48,28 +48,25 @@ public class Listeners implements Listener {
 			e.setCancelled(true);
 			String message = e.getMessage().split(" ")[0];
 			if (ItemSelectionListener.isNumeric(message)) {
-				int amount = Integer.valueOf(message);
+				int amount = Integer.parseInt(message);
 				if (amount >= Tuccar.instance.getConfig().getInt("Settings.minimumPrice")) {
 					ProductStorage storage = PlayerProductsListener.rePrice.get(e.getPlayer().getName());
-					storage.getID();
-					Bukkit.getScheduler().runTaskAsynchronously(Tuccar.instance, new Runnable() {
-						public void run() {
-							String sellers = storage.getDataName();
-							DatabaseQueries.setProductPrice(storage.getID(), amount);
-							if (Tuccar.productInfo.containsKey(sellers)) {
-								ProductCounts counts = Tuccar.productInfo.get(sellers);
-								if (amount < counts.getMinPrice()) counts.setMinPrice(amount);
-								else if (storage.getPrice() == counts.getMinPrice()) counts.setMinPrice(DatabaseQueries.getMinimumPrice(sellers, storage.getItemCategory()));
-								Tuccar.productInfo.replace(sellers, counts);
-							}
-						}
-					});
+					Bukkit.getScheduler().runTaskAsynchronously(Tuccar.instance, () -> {
+                        String sellers = storage.getDataName();
+                        DatabaseQueries.setProductPrice(storage.getID(), amount);
+                        if (Tuccar.productInfo.containsKey(sellers)) {
+                            ProductCounts counts = Tuccar.productInfo.get(sellers);
+                            if (amount < counts.getMinPrice()) counts.setMinPrice(amount);
+                            else if (storage.getPrice() == counts.getMinPrice()) counts.setMinPrice(DatabaseQueries.getMinimumPrice(sellers, storage.getItemCategory()));
+                            Tuccar.productInfo.replace(sellers, counts);
+                        }
+                    });
 					e.getPlayer().sendMessage(getLang.getText("Messages.rePriceSuccess"));
 				} else e.getPlayer().sendMessage(getLang.getText("Messages.priceLow").replace("{min}", String.valueOf(Tuccar.instance.getConfig().getInt("Settings.minimumPrice"))));
 			} else {
 				PlayerProductsListener.rePrice.remove(e.getPlayer().getName());
 				e.getPlayer().sendMessage(getLang.getText("Messages.inputMustInteger"));}
-		} else return;
+		}
 	}
 	
 	@EventHandler

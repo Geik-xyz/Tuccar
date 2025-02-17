@@ -1,7 +1,7 @@
 name: Tuccar
 main: poyrazinan.com.tr.tuccar.Tuccar
-version: 1.2.9
-api-version: 1.13
+version: 1.3.0
+api-version: 1.20
 softdepend: [CustomItems]
 author: Geik
 commands:

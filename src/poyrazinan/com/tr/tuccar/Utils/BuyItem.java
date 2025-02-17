@@ -49,7 +49,7 @@ public class BuyItem {
 					&& (Tuccar.instance.getConfig().isSet("Tuccar." + product.getItemCategory() + ".items." + product.getDataName() + ".potionType")) ) {
 				PotionType type = null;
 				try {type = PotionType.valueOf(Tuccar.instance.getConfig().getString("Tuccar." + product.getItemCategory() + ".items." + product.getDataName() + ".potionType"));
-				} catch (NullPointerException e1) {}
+				} catch (NullPointerException ignored) {}
 				Potion potion = null;
 				if (product.getItemDamage() == 1 || product.getItemDamage() == 2)potion = new Potion(type, product.getItemDamage());
 				else {
@@ -78,7 +78,7 @@ public class BuyItem {
     					if (product.getLore() != null) meta.setLore(newList);
     					item.setItemMeta(AMeta);
     		    	} else meta.addEnchant(ench, enchs.get(ench), true);
-    			} catch (NullPointerException e1) {}
+    			} catch (NullPointerException ignored) {}
     		}
     	}
     	if (!item.getType().equals(Material.ENCHANTED_BOOK)) item.setItemMeta(meta);

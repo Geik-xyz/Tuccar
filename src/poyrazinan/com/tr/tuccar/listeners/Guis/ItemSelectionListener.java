@@ -30,8 +30,7 @@ public class ItemSelectionListener implements Listener {
 	public static List<String> filterPlayer = new ArrayList<String>();
 
 	@EventHandler
-	public void onInventory(InventoryClickEvent e) throws ClassNotFoundException, InstantiationException,
-			IllegalAccessException, SQLException, ParseException {
+	public void onInventory(InventoryClickEvent e) {
 		if (e.getView().getTitle().contains(Tuccar.color(getLang.getText("CategoryGui")))) {
 			e.setCancelled(true);
 			if (e.getClickedInventory() != null && e.getClickedInventory().getType() == InventoryType.CHEST) {

@@ -29,19 +29,19 @@ import poyrazinan.com.tr.tuccar.Utils.Storage.GuiUtils.ProductCounts;
 import poyrazinan.com.tr.tuccar.commands.CommandRegister;
 import poyrazinan.com.tr.tuccar.database.ConnectionPool;
 import poyrazinan.com.tr.tuccar.database.DatabaseQueries;
+import poyrazinan.com.tr.tuccar.database.RedisManager;
 import poyrazinan.com.tr.tuccar.listeners.ListenerRegister;
 
-@SuppressWarnings("deprecation")
 public class Tuccar extends JavaPlugin {
 
 	public static Tuccar instance;
 	public static Economy econ = null;
 
-	public static List<CategoryStorage> categoryStore = new ArrayList<CategoryStorage>();
+	public static List<CategoryStorage> categoryStore = new ArrayList<>();
 	public static HashMap<String, List<ProductCategoryStorage>> productCategory = new HashMap<String, List<ProductCategoryStorage>>();
 	public static HashMap<ItemStack, ProductCategoryStorage> itemToObject = new HashMap<ItemStack, ProductCategoryStorage>();
 	public static HashMap<String, ProductCounts> productInfo = new HashMap<String, ProductCounts>();
-
+	private static boolean redisEnabled = false;
 	public static HashMap<Integer, CustomItemCache> customItems = new HashMap<Integer, CustomItemCache>();
 
 	public void onEnable() {
@@ -49,12 +49,54 @@ public class Tuccar extends JavaPlugin {
 		saveDefaultConfig();
 		getLang.FileChecker("lang");
 		setupEconomy();
-		ConnectionPool.initsqlite();
-		DatabaseQueries.createTable();
 		new CommandRegister();
 		new ListenerRegister();
 		safeReload();
 		MetricLoader();
+		// Veritabanı bağlantısını başlat
+		try {
+			ConnectionPool.initialize();
+			getLogger().info("Veritabanı bağlantısı başarıyla kuruldu!");
+		} catch (Exception e) {
+			getLogger().severe("Veritabanı bağlantısı kurulamadı: " + e.getMessage());
+			getServer().getPluginManager().disablePlugin(this);
+			return;
+		}
+
+		// Tabloları oluştur
+		try {
+			DatabaseQueries.createTable();
+			getLogger().info("Veritabanı tabloları kontrol edildi/oluşturuldu!");
+		} catch (Exception e) {
+			getLogger().severe("Veritabanı tabloları oluşturulurken hata: " + e.getMessage());
+			getServer().getPluginManager().disablePlugin(this);
+			return;
+		}
+
+		redisEnabled = getConfig().getBoolean("Redis.enabled", false);
+		if (redisEnabled) {
+			try {
+				RedisManager.initialize(getConfig());
+				getLogger().info("Redis bağlantısı başarıyla kuruldu!");
+			} catch (Exception e) {
+				getLogger().severe("Redis bağlantısı kurulamadı: " + e.getMessage());
+				redisEnabled = false;
+			}
+		}
+	}
+	@Override
+	public void onDisable() {
+		if (redisEnabled) {
+			RedisManager.shutdown();
+		}
+		try {
+			ConnectionPool.closePool();
+		} catch (Exception e) {
+			getLogger().severe("Veritabanı bağlantısı kapatılırken hata: " + e.getMessage());
+		}
+	}
+	public static boolean isRedisEnabled() {
+		return redisEnabled;
 	}
 
 	@SuppressWarnings({})
@@ -63,7 +105,7 @@ public class Tuccar extends JavaPlugin {
 			public void run() {
 
 				String nms = getNMSVersion();
-				if (nms.contains("1_16") || nms.contains("1_15") || nms.contains("1_14") || nms.contains("1_13")) {
+				if (nms.contains("1_21") ||  nms.contains("1_16") || nms.contains("1_15") || nms.contains("1_14") || nms.contains("1_13")) {
 
 					Bukkit.getConsoleSender()
 							.sendMessage(Tuccar.color(" &6Tüccar &8▸ &aEğer yüksek sürüm configini çıkarmadıysanız."));
@@ -103,7 +145,7 @@ public class Tuccar extends JavaPlugin {
 								ProductCategoryStorage productStorage = new ProductCategoryStorage(d,
 										CItem.getType().name().toLowerCase(), s, CItem.getItemMeta().getDisplayName(),
 										CItem.getItemMeta().getDisplayName(), CItem.getItemMeta().getLore(),
-										(int) CItem.getDurability());
+                                        CItem.getDurability());
 
 								itemToObject.put(CItem, productStorage);
 								productInfo.put(d, DatabaseQueries.getProductInfos(d, s));

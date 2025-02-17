@@ -54,7 +54,7 @@ public class ItemGuiListener implements Listener {
 							 ItemSelectionGui.createGui(player, category, 1);
 							 return;
 						 }
-						 if (item.size() != 0) {
+						 if (!item.isEmpty()) {
 							 int tiklama = 0;
 							 if (e.getSlot() == 53) player.closeInventory();
 							 else if (e.getSlot() >= 10 && e.getSlot() <= 43){
@@ -68,11 +68,7 @@ public class ItemGuiListener implements Listener {
 								 
 								 int buyAmount = 1;
 								 
-								 if (e.getClick().equals(ClickType.LEFT)) {
-									 buyAmount = 1;
-								 }
-								 
-								 else if (e.getClick().equals(ClickType.SHIFT_LEFT))
+								 if (e.getClick().equals(ClickType.SHIFT_LEFT))
 								 {
 									  
 									 if (Tuccar.instance.getConfig().isSet("Settings.customBuyAmount"))
